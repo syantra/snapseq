@@ -1,3 +1,5 @@
+<p align="center"><img src="https://raw.githubusercontent.com/syantra/snapseq/main/assets/logo.svg" width="128" alt=""></p>
+
 # snapseq
 
 [![npm](https://img.shields.io/npm/v/snapseq)](https://www.npmjs.com/package/snapseq)
