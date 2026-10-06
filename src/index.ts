@@ -1,4 +1,4 @@
-export { defineSnapseq } from "./define.js";
+export { defineConfig } from "./define.js";
 export type { DeviceConfig, EnvConfig, SnapseqConfig } from "./define.js";
 
 export { capture, skipIf } from "./fixtures.js";

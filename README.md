@@ -20,9 +20,9 @@ pnpm exec playwright install chromium   # once per machine; under Node 26 run th
 
 ```ts
 // snapseq.config.ts
-import { defineSnapseq } from "snapseq";
+import { defineConfig } from "snapseq";
 
-export default defineSnapseq({
+export default defineConfig({
   envs: { dev: { host: "http://localhost:3000" } },
 });
 ```

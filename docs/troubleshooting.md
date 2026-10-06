@@ -119,13 +119,13 @@ first run's numbered shots.
 **Fix.** Run again with a new run directory instead. For a flaky step, wait
 for the state the shot needs rather than retrying the capture.
 
-## `snapseq: the Playwright config must come from defineSnapseq()`
+## `snapseq: the Playwright config must come from snapseq's defineConfig()`
 
 **Cause.** The capture ran under a config that did not come from
-`defineSnapseq`, usually the wrong `-c <path>` or a plain Playwright
+`defineConfig`, usually the wrong `-c <path>` or a plain Playwright
 config picked up from the directory.
-**Fix.** Point the command at `snapseq.config.ts`, and compose any extra
-Playwright options over `defineSnapseq` with `defineConfig`. See
+**Fix.** Point the command at `snapseq.config.ts`, and pass extra Playwright
+options as a second argument to snapseq's `defineConfig`. See
 [Config](config.md#overriding-playwright-options).
 
 ## The dev server starts although one is already running, or never starts

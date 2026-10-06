@@ -288,15 +288,15 @@ capture(async ({ page, seq, env, host }) => {
 
 The config for a project with a local dev server, a password-protected
 staging host that also wants a header, a production host with a saved login,
-and three devices including one of Playwright's descriptors. Composed over
-`defineConfig` for a browser flag.
+and three devices including one of Playwright's descriptors. A second argument
+adds a browser flag.
 
 ```ts
 // snapseq.config.ts
-import { defineConfig, devices } from "@playwright/test";
-import { defineSnapseq } from "snapseq";
+import { devices } from "@playwright/test";
+import { defineConfig } from "snapseq";
 
-const base = defineSnapseq({
+export default defineConfig({
   envs: {
     dev: { host: "http://localhost:3000", webServer: "pnpm dev" },
     staging: {
@@ -311,9 +311,7 @@ const base = defineSnapseq({
     phone: devices["iPhone 14"],
     "300x250": { viewport: { width: 300, height: 250 } },
   },
-});
-
-export default defineConfig(base, {
+}, {
   use: { launchOptions: { args: ["--lang=de"] } },
 });
 ```

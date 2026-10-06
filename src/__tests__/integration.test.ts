@@ -260,8 +260,8 @@ beforeAll(async () => {
   project = makeProject({
     esm: true,
     config: `
-import { defineSnapseq } from "snapseq";
-export default defineSnapseq({
+import { defineConfig } from "snapseq";
+export default defineConfig({
   envs: { dev: { host: "${server.url}" }, dead: { host: "http://127.0.0.1:9" } },
   devices: {
     d1: { viewport: { width: 400, height: 300 } },
@@ -357,8 +357,8 @@ describe("snapseq via the Playwright CLI", () => {
     const cjs = makeProject({
       esm: false,
       config: `
-import { defineSnapseq } from "snapseq";
-export default defineSnapseq({
+import { defineConfig } from "snapseq";
+export default defineConfig({
   envs: { dev: { host: "${server.url}", httpCredentials: { username: "u", password: "p" } } },
   devices: { d1: { viewport: { width: 320, height: 200 } } },
 });
@@ -448,8 +448,8 @@ describe("webServer", () => {
     const ws = makeProject({
       esm: true,
       config: `
-import { defineSnapseq } from "snapseq";
-export default defineSnapseq({
+import { defineConfig } from "snapseq";
+export default defineConfig({
   envs: { dev: { host: "http://127.0.0.1:${port}", webServer: "node server.mjs ${port}" } },
   devices: { d1: { viewport: { width: 320, height: 200 } } },
 });
@@ -494,8 +494,8 @@ describe("helpers", () => {
     const p = makeProject({
       esm: true,
       config: `
-import { defineSnapseq } from "snapseq";
-export default defineSnapseq({
+import { defineConfig } from "snapseq";
+export default defineConfig({
   envs: { dev: { host: "${server.url}" } },
   devices: { d1: { viewport: { width: 400, height: 300 } } },
   screenshotsDir: "out",
@@ -609,8 +609,8 @@ capture(async ({ page, seq }) => {
 
 describe("snapPage geometry", () => {
   const config = () => `
-import { defineSnapseq } from "snapseq";
-export default defineSnapseq({
+import { defineConfig } from "snapseq";
+export default defineConfig({
   envs: { dev: { host: "${server.url}" } },
   devices: { d1: { viewport: { width: 400, height: 300 } } },
   screenshotsDir: "out",
@@ -673,18 +673,17 @@ capture(async ({ page, seq }) => {
 });
 
 describe("navigation", () => {
-  it("is bounded by navigationTimeout, which composes through defineConfig", async () => {
+  it("is bounded by navigationTimeout, which an override argument can change", async () => {
     const p = makeProject({
       esm: true,
       config: `
-import { defineConfig } from "@playwright/test";
-import { defineSnapseq } from "snapseq";
+import { defineConfig } from "snapseq";
 export default defineConfig(
-  defineSnapseq({
+  {
     envs: { dev: { host: "${server.url}" } },
     devices: { d1: { viewport: { width: 320, height: 200 } } },
     screenshotsDir: "out",
-  }),
+  },
   { use: { navigationTimeout: 1000 } },
 );
 `,
@@ -709,8 +708,8 @@ describe("timeout", () => {
     const p = makeProject({
       esm: true,
       config: `
-import { defineSnapseq } from "snapseq";
-export default defineSnapseq({
+import { defineConfig } from "snapseq";
+export default defineConfig({
   envs: { dev: { host: "${server.url}" } },
   devices: { d1: { viewport: { width: 320, height: 200 } } },
   screenshotsDir: "out",

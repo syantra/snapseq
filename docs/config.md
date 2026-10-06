@@ -1,14 +1,14 @@
 # Config
 
-`snapseq.config.ts` exports the result of `defineSnapseq()`, which is a
+`snapseq.config.ts` exports the result of `defineConfig()`, which is a
 Playwright Test config. The command finds it in the current directory, or
 takes `-c <path>`.
 
 ```ts
 // snapseq.config.ts
-import { defineSnapseq } from "snapseq";
+import { defineConfig } from "snapseq";
 
-export default defineSnapseq({
+export default defineConfig({
   envs: {
     dev: { host: "http://localhost:3000", webServer: "pnpm dev" },
     staging: {
@@ -95,7 +95,7 @@ directory name, not a path.
 
 ## Playwright defaults
 
-`defineSnapseq` applies these to the Playwright config:
+`defineConfig` applies these to the Playwright config:
 
 | Option              | Value                           | Why                                                                                                                                       |
 | ------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
@@ -112,15 +112,16 @@ directory name, not a path.
 
 ## Overriding Playwright options
 
-Compose with Playwright's `defineConfig`, which merges `use`:
+Extra arguments to `defineConfig` are overrides, merged the way Playwright's
+own `defineConfig` merges them, which runs underneath: `use` is merged, the
+rest replaced.
 
 ```ts
 // snapseq.config.ts
-import { defineConfig } from "@playwright/test";
-import { defineSnapseq } from "snapseq";
+import { defineConfig } from "snapseq";
 
 export default defineConfig(
-  defineSnapseq({ envs: { dev: { host: "http://localhost:3000" } } }),
+  { envs: { dev: { host: "http://localhost:3000" } } },
   {
     workers: 2,
     use: { launchOptions: { args: ["--lang=de"] } },
@@ -128,9 +129,9 @@ export default defineConfig(
 );
 ```
 
-Composition concatenates `webServer` entries and replaces nested objects such
-as `launchOptions` whole. To drop a generated `webServer`, spread instead:
-`{ ...base, webServer: undefined }`.
+Merging concatenates `webServer` entries and replaces nested objects such as
+`launchOptions` whole. To drop a generated `webServer`, spread the result
+instead: `{ ...defineConfig({ /* … */ }), webServer: undefined }`.
 
 Playwright's own artifacts go to `node_modules/.cache/snapseq`, so
 `--trace on` leaves traces there, not among the screenshots.

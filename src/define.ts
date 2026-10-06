@@ -1,4 +1,4 @@
-import { defineConfig, type PlaywrightTestConfig } from "@playwright/test";
+import { defineConfig as definePlaywrightConfig, type PlaywrightTestConfig } from "@playwright/test";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -94,11 +94,15 @@ function defaultReporter(
 }
 
 /**
- * Build a Playwright Test config for screenshot captures.
+ * Build a Playwright Test config for screenshot captures. Extra arguments are
+ * overrides, merged the way Playwright's own `defineConfig` merges them.
  * Env vars: `SNAPSEQ_ENV` picks the env, `SNAPSEQ_HOST` overrides its host,
  * `SNAPSEQ_RUN` names the run directory (default: the time the run started).
  */
-export function defineSnapseq(config: SnapseqConfig): PlaywrightTestConfig {
+export function defineConfig(
+  config: SnapseqConfig,
+  ...overrides: PlaywrightTestConfig[]
+): PlaywrightTestConfig {
   const envNames = Object.keys(config.envs);
   // Empty means unset, as for SNAPSEQ_RUN: `--env ""` picks the default.
   const envName =
@@ -124,7 +128,8 @@ export function defineSnapseq(config: SnapseqConfig): PlaywrightTestConfig {
   const server =
     env.webServer && host === env.host ? { host, command: env.webServer } : undefined;
 
-  return defineConfig({
+  return definePlaywrightConfig(
+    {
     testDir: config.capturesDir ?? "captures",
     testMatch: /\.capture\.[cm]?[jt]s$/,
     // Playwright's own artifacts (.last-run.json, traces, error context) stay out
@@ -166,5 +171,7 @@ export function defineSnapseq(config: SnapseqConfig): PlaywrightTestConfig {
       name,
       use,
     })),
-  });
+    },
+    ...overrides,
+  );
 }

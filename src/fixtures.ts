@@ -49,7 +49,7 @@ const DEFAULT_TITLE = "capture";
 
 function metadataOf(testInfo: TestInfo): SnapseqMetadata {
   const meta = (testInfo.config.metadata as { snapseq?: SnapseqMetadata }).snapseq;
-  if (!meta) throw new Error("snapseq: the Playwright config must come from defineSnapseq()");
+  if (!meta) throw new Error("snapseq: the Playwright config must come from snapseq's defineConfig()");
   return meta;
 }
 

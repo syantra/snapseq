@@ -36,9 +36,9 @@ depend on it with `"snapseq": "file:../../vendor/snapseq"`.
 
 ```ts
 // snapseq.config.ts
-import { defineSnapseq } from "snapseq";
+import { defineConfig } from "snapseq";
 
-export default defineSnapseq({
+export default defineConfig({
   envs: {
     dev: { host: "http://localhost:3000", webServer: "pnpm dev" },
   },
