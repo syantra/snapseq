@@ -3,6 +3,27 @@
   "version": "0.1.0",
   "description": "Playwright Test fixtures for scripted screenshot captures.",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syantra/snapseq.git"
+  },
+  "homepage": "https://github.com/syantra/snapseq#readme",
+  "bugs": {
+    "url": "https://github.com/syantra/snapseq/issues"
+  },
+  "keywords": [
+    "playwright",
+    "screenshot",
+    "screenshots",
+    "capture",
+    "full-page",
+    "visual",
+    "fixtures",
+    "testing"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "files": [
     "dist"
@@ -11,7 +32,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "snapseq": "./dist/cli.js"
+    "snapseq": "dist/cli.js"
   },
   "exports": {
     ".": {
@@ -24,7 +45,8 @@
     "build": "rm -rf dist && tsup",
     "prepare": "pnpm build",
     "typecheck": "tsc --noEmit",
-    "test": "pnpm build && vitest run"
+    "test": "pnpm build && vitest run",
+    "prepublishOnly": "pnpm typecheck && pnpm test"
   },
   "peerDependencies": {
     "@playwright/test": ">=1.59 <2"
