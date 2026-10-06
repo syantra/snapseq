@@ -1,0 +1,92 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { defineSnapseq } from "../define.js";
+
+const envs = {
+  dev: { host: "http://localhost:3000" },
+  staging: {
+    host: "https://staging.example.com:8443/app",
+    httpCredentials: { username: "u", password: "p" },
+  },
+};
+const use = (config: ReturnType<typeof defineSnapseq>) =>
+  config.use as {
+    baseURL?: string;
+    httpCredentials?: { origin?: string };
+    navigationTimeout?: number;
+    actionTimeout?: number;
+    extraHTTPHeaders?: Record<string, string>;
+    storageState?: string;
+  };
+
+beforeEach(() => {
+  vi.stubEnv("SNAPSEQ_RUN", "run1");
+  vi.stubEnv("SNAPSEQ_ENV", "");
+  vi.stubEnv("SNAPSEQ_HOST", "");
+});
+afterEach(() => vi.unstubAllEnvs());
+
+describe("defineSnapseq", () => {
+  it("bounds navigation on its own, apart from actions and the capture timeout", () => {
+    const u = use(defineSnapseq({ envs }));
+    expect(u.navigationTimeout).toBe(120_000);
+    expect(u.actionTimeout).toBe(30_000);
+  });
+
+  it("offers env credentials to the resolved host's origin only, unless an origin is given", () => {
+    vi.stubEnv("SNAPSEQ_ENV", "staging");
+    expect(use(defineSnapseq({ envs })).httpCredentials).toEqual({
+      origin: "https://staging.example.com:8443",
+      username: "u",
+      password: "p",
+    });
+    vi.stubEnv("SNAPSEQ_HOST", "http://127.0.0.1:4000/");
+    expect(use(defineSnapseq({ envs })).httpCredentials?.origin).toBe("http://127.0.0.1:4000");
+    const pinned = { ...envs, staging: { ...envs.staging, httpCredentials: { ...envs.staging.httpCredentials, origin: "https://sso.example.com" } } };
+    expect(use(defineSnapseq({ envs: pinned })).httpCredentials?.origin).toBe("https://sso.example.com");
+    vi.stubEnv("SNAPSEQ_ENV", "dev");
+    expect(use(defineSnapseq({ envs })).httpCredentials).toBeUndefined();
+  });
+
+  it("merges an env's own Playwright use options over the defaults", () => {
+    const u = use(
+      defineSnapseq({
+        envs: {
+          dev: { host: "http://localhost:3000" },
+          staging: {
+            host: "https://staging.example.com",
+            use: { extraHTTPHeaders: { authorization: "Bearer t" }, storageState: "s.json", actionTimeout: 5_000 },
+          },
+        },
+      }),
+    );
+    expect(u.extraHTTPHeaders).toBeUndefined();
+    vi.stubEnv("SNAPSEQ_ENV", "staging");
+    const s = use(
+      defineSnapseq({
+        envs: {
+          dev: { host: "http://localhost:3000" },
+          staging: {
+            host: "https://staging.example.com",
+            use: { extraHTTPHeaders: { authorization: "Bearer t" }, storageState: "s.json", actionTimeout: 5_000 },
+          },
+        },
+      }),
+    );
+    expect(s.extraHTTPHeaders).toEqual({ authorization: "Bearer t" });
+    expect(s.storageState).toBe("s.json");
+    expect(s.actionTimeout).toBe(5_000); // an env's own value wins over the default
+    expect(s.baseURL).toBe("https://staging.example.com"); // the rest stays
+    expect(s.navigationTimeout).toBe(120_000);
+  });
+
+  it("takes a run or device name, never a path: the directory it names is wiped", () => {
+    for (const run of ["../outside", "a/b", "..", ".", "c\\d"]) {
+      vi.stubEnv("SNAPSEQ_RUN", run);
+      expect(() => defineSnapseq({ envs })).toThrow(`SNAPSEQ_RUN must be a directory name, not a path: "${run}"`);
+    }
+    vi.stubEnv("SNAPSEQ_RUN", "review 1");
+    expect(() => defineSnapseq({ envs })).not.toThrow();
+    expect(() => defineSnapseq({ envs, devices: { "../d": {} } })).toThrow("a device name must be a directory name");
+    expect(() => defineSnapseq({ envs, devices: { "300x250": { viewport: { width: 300, height: 250 } } } })).not.toThrow();
+  });
+});
