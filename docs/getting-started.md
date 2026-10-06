@@ -9,7 +9,7 @@ In the app that owns the pages. In a monorepo, each app gets its own install
 and its own config.
 
 ```bash
-pnpm add -D @playwright/test "snapseq@github:syantra/snapseq#v0.1.0"
+pnpm add -D @playwright/test snapseq
 pnpm exec playwright install chromium
 ```
 
@@ -17,7 +17,7 @@ The browser install is once per machine. Under Node 26 it hangs; run it with
 Node 22 (`nvm use 22`). The `prepare` script builds `dist/` on install, so no
 build output is committed.
 
-Without access to the git host, vendor it instead: run `pnpm build` in a
+Without access to the registry, vendor it instead: run `pnpm build` in a
 checkout, copy `dist/`, `README.md` and `package.json` (without `scripts`,
 `devDependencies` and `files`) into the consumer, e.g. `vendor/snapseq`, and
 depend on it with `"snapseq": "file:../../vendor/snapseq"`.

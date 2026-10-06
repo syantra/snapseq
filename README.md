@@ -1,5 +1,7 @@
 # snapseq
 
+[![npm](https://img.shields.io/npm/v/snapseq)](https://www.npmjs.com/package/snapseq)
+
 Playwright Test fixtures for scripted screenshot captures. A capture is a
 Playwright test; snapseq adds numbered screenshots per run, capture and
 device, env and host selection, one project per device, a `snapseq`
@@ -12,7 +14,7 @@ extension.
 In the app that owns the pages:
 
 ```bash
-pnpm add -D @playwright/test "snapseq@github:syantra/snapseq#v0.1.0"
+pnpm add -D @playwright/test snapseq
 pnpm exec playwright install chromium   # once per machine; under Node 26 run this with Node 22
 ```
 
@@ -62,11 +64,13 @@ pnpm screenshot   # "screenshot": "snapseq" in package.json
 ## Develop and release
 
 ```bash
-pnpm install          # also builds dist/ via prepare
+pnpm install             # also builds dist/ via prepare
 pnpm typecheck
-pnpm test             # builds, then unit + integration tests (real Chromium)
-git tag v0.1.0 && git push origin HEAD v0.1.0
+pnpm test                # builds, then unit + integration tests (real Chromium)
+pnpm changeset           # describe a change; one file per change in .changeset/
+pnpm changeset version   # bump package.json and write CHANGELOG.md
+pnpm release             # typecheck, test, build, publish to npm, tag
+git push --follow-tags
 ```
 
-Consumers bump the tag in their `package.json`. `docs/` is the API reference;
-a public change updates it.
+`docs/` is the API reference; a public change updates it and gets a changeset.
